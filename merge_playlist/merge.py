@@ -1,6 +1,7 @@
 import re
 from collections import OrderedDict
 from gensim import corpora, models, similarities
+from zhconv import convert
 
 import logging
 import jieba
@@ -105,6 +106,8 @@ def merge(leader_playlist, *crowd_playlist_list, similar_threshold=DEFAULT_SIMIL
 # 分词
 def channel_name_participle(name):
     name = name.lower()
+    # 转为大陆简体
+    name = convert(name, 'zh-cn')
     name = re.sub(r'福建(?=东南卫视)', '', name)
     name = re.sub(r'(?<=凤凰)卫视', '中文', name)
 
