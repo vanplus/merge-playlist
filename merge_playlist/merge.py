@@ -1,10 +1,10 @@
 import re
 from collections import OrderedDict
-
 from gensim import corpora, models, similarities
 
 import logging
 import jieba
+from jieba import posseg
 
 jieba.setLogLevel(logging.INFO)
 
@@ -16,7 +16,7 @@ def merge(leader_playlist, *crowd_playlist_list, similar_threshold=DEFAULT_SIMIL
         return
 
     # 以 leader playlist 中的频道名们建立索引
-    index_texts = [segment_channel_name(channel[-2]) for channel in leader_playlist]
+    index_texts = [channel_name_participle(channel[-2]) for channel in leader_playlist]
     sim_index = SimilarIndex(index_texts)
     merged_playlist = []
 
@@ -52,7 +52,7 @@ def merge(leader_playlist, *crowd_playlist_list, similar_threshold=DEFAULT_SIMIL
 
         # 先将 leader_playlist 中的与 base_channel 名字相同或相似 且 与 base_channel 同 group 的 channels 放进最终结果
         base_channel_and_siblings_indexs = [base_channel_index]
-        sims = sim_index.find_sims(segment_channel_name(base_channel[-2]))
+        sims = sim_index.find_sims(channel_name_participle(base_channel[-2]))
         for i, sim in enumerate(sims):
             if i not in merged_leader_channel_idx_list and sim >= similar_threshold:
                 similar_to_base = leader_playlist[i]
@@ -73,7 +73,7 @@ def merge(leader_playlist, *crowd_playlist_list, similar_threshold=DEFAULT_SIMIL
 
                     # for i, crowd_channel in enumerate(crowd_playlist):
                 crowd_channel = crowd_playlist[index]
-                sims = sim_index.find_sims(segment_channel_name(crowd_channel[-2]))
+                sims = sim_index.find_sims(channel_name_participle(crowd_channel[-2]))
 
                 # 判断 crowd_channel 是否与 base_channel_and_siblings_indexs 中的至少一个名字相似
                 if [_i for _i in base_channel_and_siblings_indexs if sims[_i] >= similar_threshold]:
@@ -103,17 +103,20 @@ def merge(leader_playlist, *crowd_playlist_list, similar_threshold=DEFAULT_SIMIL
 
 
 # 分词
-def segment_channel_name(name):
+def channel_name_participle(name):
     name = name.lower()
     name = re.sub(r'福建(?=东南卫视)', '', name)
     name = re.sub(r'(?<=凤凰)卫视', '中文', name)
 
+    stop_flag = 'x'  # 表示符号
+    not_stop_words = ["-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
     stop_words = ['FHD'.lower(), 'HD'.lower(), 'SD'.lower(), '高清', '标清', '移动', '联通', '电信', '官方']
     regex = "|".join([r'\s+\d+', *[r'{}\s*\d*'.format(s) for s in stop_words]])
     name = re.sub(regex, '', name)
+    name = re.sub(r'台$', '', name.strip())
 
-    words = jieba.cut(name)
-    return [word for word in words if word.strip() != '']
+    words = posseg.cut(name)
+    return [word for word, flag in words if word in not_stop_words or flag != stop_flag]
 
 
 class SimilarIndex:

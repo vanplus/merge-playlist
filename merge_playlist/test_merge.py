@@ -1,19 +1,19 @@
 import unittest
 
-from merge_playlist.merge import segment_channel_name, SimilarIndex, DEFAULT_SIMILAR_THRESHOLD
+from merge_playlist.merge import channel_name_participle, SimilarIndex, DEFAULT_SIMILAR_THRESHOLD
 
 
 class MyTestCase(unittest.TestCase):
-    def test_segment_channel_name(self):
-        w1 = segment_channel_name('CCTV-5+ 体育赛事 HD')
-        w2 = segment_channel_name('CCTV-15 音乐')
-        w3 = segment_channel_name('CCTV-8 电视剧 FHD')
-        w4 = segment_channel_name('东南卫视')
-        w5 = segment_channel_name('福建东南卫视')
-        w6 = segment_channel_name('凤凰卫视')
-        w7 = segment_channel_name('凤凰 中文 移动1')
-        w8 = segment_channel_name('民视 3')
-        w9 = segment_channel_name('民视3')
+    def test_channel_name_participle(self):
+        w1 = channel_name_participle('CCTV-5+ 体育赛事 HD')
+        w2 = channel_name_participle('CCTV-15 音乐')
+        w3 = channel_name_participle('CCTV-8 电视剧 FHD')
+        w4 = channel_name_participle('东南卫视')
+        w5 = channel_name_participle('福建东南卫视')
+        w6 = channel_name_participle('凤凰卫视')
+        w7 = channel_name_participle('凤凰 中文 移动1')
+        w8 = channel_name_participle('民视 3')
+        w9 = channel_name_participle('民视3')
         self.assertEqual(w6, ['凤凰', '中文'])
         self.assertEqual(w7, ['凤凰', '中文'])
         self.assertEqual(w8, ['民视'])
@@ -156,50 +156,50 @@ class MyTestCase(unittest.TestCase):
 
         simi_index = SimilarIndex(index_texts)
 
-        channel_words1 = segment_channel_name('华数-10')
+        channel_words1 = channel_name_participle('华数-10')
         q_lsi1 = simi_index.find_sims(channel_words1, model_type='lsi')  # 'CCTV' '-' '10': 0.9591 | '第' '10' '集': 0.6611
         q_tfidf1 = simi_index.find_sims(channel_words1,
                                         model_type='tfidf')  # 'CCTV' '-' '10': 0.6689 | '第' '10' '集': dash: 0.7618 no_dash 0.87
-        channel_words2 = segment_channel_name('CETV-1')
+        channel_words2 = channel_name_participle('CETV-1')
         q_lsi2 = simi_index.find_sims(channel_words2, model_type='lsi')  # 'CCTV' '-' '1': 0.8426
         q_tfidf2 = simi_index.find_sims(channel_words2,
                                         model_type='tfidf')  # 'CCTV' '-' '1': 0.7509 | '第' '1' '集': 0.6818
-        channel_words3 = segment_channel_name('CCTV-1 综合')
+        channel_words3 = channel_name_participle('CCTV-1 综合')
         q_lsi3 = simi_index.find_sims(channel_words3, model_type='lsi')  # 'CCTV' '-' '1' '综合': 0.9896
         q_tfidf3 = simi_index.find_sims(channel_words3, model_type='tfidf')  # 'CCTV' '-' '1' '综合': 1.0
 
-        channel_words4 = segment_channel_name('CCTV-5+ 体育赛事')
+        channel_words4 = channel_name_participle('CCTV-5+ 体育赛事')
         q_lsi4 = simi_index.find_sims(channel_words4,
                                       model_type='lsi')  # 'CCTV', '-', '5', '体育': 0.9931 | 'CCTV', '-', '5', '+', '体育': 0.9795
         q_tfidf4 = simi_index.find_sims(channel_words4,
                                         model_type='tfidf')  # 'CCTV', '-', '5', '体育': 0.7809, 0.63 | 'CCTV', '-', '5', '+', '体育': dash 0.92 nodash: 0.91
-        channel_words5 = segment_channel_name('CCTV - 5 + 体育')
+        channel_words5 = channel_name_participle('CCTV - 5 + 体育')
         q_lsi5 = simi_index.find_sims(channel_words5,
                                       model_type='lsi')  # 'CCTV', '-', '5', '体育': 0.9931
         q_tfidf5 = simi_index.find_sims(channel_words5,
                                         model_type='tfidf')  # 'CCTV', '-', '5', '体育': 0.7809
 
-        channel_words7 = segment_channel_name('CCTV-7 国防军事 FHD')
+        channel_words7 = channel_name_participle('CCTV-7 国防军事 FHD')
         q_lsi7 = simi_index.find_sims(channel_words7,
                                       model_type='lsi')  # 'CCTV', '-', '7', '军事', '农业': 0.9281
         q_tfidf7 = simi_index.find_sims(channel_words7,
                                         model_type='tfidf')  # 'CCTV', '-', '7', '军事', '农业': dash 0.8640 nodash 0.8511
-        channel_words8 = segment_channel_name('CCTV-8 电视剧 FHD')
+        channel_words8 = channel_name_participle('CCTV-8 电视剧 FHD')
         q_lsi8 = simi_index.find_sims(channel_words8,
                                       model_type='lsi')  # 'CCTV', '-', '8': 0.8991
         q_tfidf8 = simi_index.find_sims(channel_words8,
                                         model_type='tfidf')  # 'CCTV', '-', '8': dash 0.9999 nodash 1
-        channel_words9 = segment_channel_name('东南卫视')
+        channel_words9 = channel_name_participle('东南卫视')
         q_lsi9 = simi_index.find_sims(channel_words9,
                                       model_type='lsi')  #
         q_tfidf9 = simi_index.find_sims(channel_words9,
                                         model_type='tfidf')  # '福建' '东南' '卫视':
-        channel_words10 = segment_channel_name('凤凰 中文 移动1')
+        channel_words10 = channel_name_participle('凤凰 中文 移动1')
         q_lsi10 = simi_index.find_sims(channel_words10,
                                        model_type='lsi')  #
         q_tfidf10 = simi_index.find_sims(channel_words10,
                                          model_type='tfidf')  # '凤凰' '中文':
-        channel_words11 = segment_channel_name('CCTV-4 美洲')
+        channel_words11 = channel_name_participle('CCTV-4 美洲')
         q_lsi11 = simi_index.find_sims(channel_words11,
                                        model_type='lsi')  #
         q_tfidf11 = simi_index.find_sims(channel_words11,
