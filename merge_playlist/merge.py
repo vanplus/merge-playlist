@@ -9,7 +9,7 @@ from jieba import posseg
 
 jieba.setLogLevel(logging.INFO)
 
-DEFAULT_SIMILAR_THRESHOLD = 0.85
+DEFAULT_SIMILAR_THRESHOLD = 0.87
 
 
 def merge(leader_playlist, *crowd_playlist_list, similar_threshold=DEFAULT_SIMILAR_THRESHOLD):
